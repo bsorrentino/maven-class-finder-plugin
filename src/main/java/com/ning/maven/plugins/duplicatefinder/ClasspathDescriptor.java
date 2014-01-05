@@ -60,7 +60,7 @@ public class ClasspathDescriptor
                                                                  Pattern.compile("META-INF/SPRING\\.SCHEMAS"),
                                                                  Pattern.compile("META-INF/SPRING\\.TOOLING")};
     
-    private static final Set IGNORED_LOCAL_DIRECTORIES = new HashSet();
+    private static final Set<String> IGNORED_LOCAL_DIRECTORIES = new HashSet<String>();
 
     private static final Map CACHED_BY_ELEMENT = new HashMap();
 
@@ -71,11 +71,9 @@ public class ClasspathDescriptor
         IGNORED_LOCAL_DIRECTORIES.add(".BZR");
     }
 
-    // TreeMap<String, File>
-    private Map classesWithElements   = new TreeMap();
+    private Map<String,Set<File>> classesWithElements   = new TreeMap<String,Set<File>>();
     
-    // TreeMap<String, File>
-    private Map resourcesWithElements = new TreeMap();
+    private Map<String,Set<File>> resourcesWithElements = new TreeMap<String,Set<File>>();
     
     private boolean useDefaultResourceIgnoreList = true;
 
@@ -119,26 +117,26 @@ public class ClasspathDescriptor
         }
     }
 
-    public Set getClasss()
+    public Set<String> getClasses()
     {
         return Collections.unmodifiableSet(classesWithElements.keySet());
     }
 
-    public Set getResources()
+    public Set<String> getResources()
     {
         return Collections.unmodifiableSet(resourcesWithElements.keySet());
     }
 
-    public Set getElementsHavingClass(String className)
+    public Set<File> getElementsHavingClass(String className)
     {
-        Set elements = (Set)classesWithElements.get(className);
+    	Set<File> elements = classesWithElements.get(className);
 
         return elements == null ? null : Collections.unmodifiableSet(elements);
     }
 
-    public Set getElementsHavingResource(String resource)
+    public Set<File> getElementsHavingResource(String resource)
     {
-        Set elements = (Set)resourcesWithElements.get(resource);
+    	Set<File> elements = resourcesWithElements.get(resource);
 
         return elements == null ? null : Collections.unmodifiableSet(elements);
     }

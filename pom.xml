@@ -23,18 +23,11 @@ under the License.
     <version>7</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.ning.maven.plugins</groupId>
-  <artifactId>maven-duplicate-finder-plugin</artifactId>
+  <groupId>org.bsc.maven</groupId>
+  <artifactId>maven-class-finder-plugin</artifactId>
   <packaging>maven-plugin</packaging>
-  <version>1.0.6-SNAPSHOT</version>
-  <name>maven-duplicate-finder-plugin Maven Mojo</name>
-  <description>
-    The maven-duplicate-class-finder-plugin is a plugin that will search for classes with the same name, as well as resources with the same path,
-    in the classpaths of a maven project. More specifically, it will check the compile, runtime, and test classpaths for
-      * Classes with the same qualified name in the current project and all dependencies relevant for that classpath
-      * Files that are not class files, with the same resource path (i.e. as if it would be accessed via the classloader) in the current project and all dependencies relevant for that 
-    (Note that at the moment, the plugin does not check if the files are actually the same or not, it only looks for the same file/class name.)
-  </description>
+  <version>1.0.0-SNAPSHOT</version>
+  <name>maven-class-finder-plugin Maven Mojo</name>
   <url>https://github.com/ning/maven-duplicate-finder-plugin</url>
   <licenses>
     <license>
@@ -115,8 +108,8 @@ under the License.
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.3.2</version>
         <configuration>
-          <source>1.4</source>
-          <target>1.4</target>
+          <source>1.6</source>
+          <target>1.6</target>
           <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
@@ -194,11 +187,12 @@ under the License.
           <execution>
             <phase>verify</phase>
             <goals>
-              <goal>check</goal>
+              <goal>rat</goal>
             </goals>
           </execution>
         </executions>
       </plugin>
+      <!-- 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-invoker-plugin</artifactId>
@@ -214,15 +208,15 @@ under the License.
                 <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
                 <localRepositoryPath>${project.build.directory}/it-repo/</localRepositoryPath>
                 <postBuildHookScript>verify.bsh</postBuildHookScript>
-                <!-- debug>true</debug -->
+                <debug>true</debug>
               </configuration>
             </execution>
           </executions>
         </plugin>
+         -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
-        <version>2.0-beta-9</version>
         <configuration>
           <mavenExecutorId>forked-path</mavenExecutorId>
         </configuration>
@@ -233,8 +227,8 @@ under the License.
         <version>2.5</version>
         <configuration>
           <additionalparam>-quiet</additionalparam>
-          <source>1.4</source>
-          <target>1.4</target>
+          <source>1.6</source>
+          <target>1.6</target>
           <encoding>UTF-8</encoding>
           <maxmemory>1g</maxmemory>
           <links>
@@ -356,4 +350,5 @@ under the License.
     <system>Github</system>
     <url>https://github.com/ning/maven-duplicate-finder-plugin/issues</url>
   </issueManagement>
+  <description>find a class searching in project dependencies</description>
 </project>
