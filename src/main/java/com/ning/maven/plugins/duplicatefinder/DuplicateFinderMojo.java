@@ -247,7 +247,7 @@ public class DuplicateFinderMojo extends AbstractMojo
         Map classDifferentConflictsByArtifactNames = new TreeMap(new ToStringComparator());
         Map classEqualConflictsByArtifactNames = new TreeMap(new ToStringComparator());
 
-        for (Iterator classNameIt = classpathDesc.getClasss().iterator(); classNameIt.hasNext();) {
+        for (Iterator classNameIt = classpathDesc.getClasses().iterator(); classNameIt.hasNext();) {
             String    className = (String)classNameIt.next();
             Set       elements  = classpathDesc.getElementsHavingClass(className);
 
