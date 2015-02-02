@@ -109,15 +109,15 @@ public class ClassFinderMojo extends AbstractMojo
     protected boolean skip = false;
 
     /**
-     * Simple class name 
-     * 
+     * Simple class name
+     *
      * @parameter alias="className"
      * 			  expression="${className}"
      */
     private String className;
-    
+
     /**
-     * 
+     *
      * @param ignoredDependencies
      * @throws InvalidVersionSpecificationException
      */
@@ -155,68 +155,68 @@ public class ClassFinderMojo extends AbstractMojo
     }
 
     private <T> void forEach( Collection<T> list, F<Void,T> functor ) {
-        
+
     	for( T e : list ) {
-    		
+
     		functor.f( e );
     	}
     }
 
-    private Map<File,Artifact> checkClasspath(List<Artifact> artifactList, 
-    							List<String> classpathElementList ) throws MojoExecutionException, DependencyResolutionRequiredException 
+    private Map<File,Artifact> checkClasspath(List<Artifact> artifactList,
+    							List<String> classpathElementList ) throws MojoExecutionException, DependencyResolutionRequiredException
     {
 
             final Map<File,Artifact> artifactsByFile = createArtifactsByFileMap(artifactList);
-            
+
             addOutputDirectory(artifactsByFile);
-            
+
         	final ClasspathDescriptor classpathDesc = createClasspathDescriptor(classpathElementList);
-        	    
-        	final Set<String> classNameList = classpathDesc.getClasses();
+
+        	final Set<String> classNameList = classpathDesc.getClasss();
         	forEach(classNameList, new F<Void,String>() {
 
 				@Override
 				public Void f(String p) {
 					getLog().debug( String.format("evaluate class[%s]", p));
 					if( className!=null && p.endsWith(className) ) {
-						
+
 						getLog().info( String.format("FOUND: %s", p));
 
 						final Set<File> sourceSet = classpathDesc.getElementsHavingClass(p);
-						
+
 						for( File f : sourceSet ) {
 							getLog().info( String.format("\tsource: %s", f.getPath()));
 						}
-						
+
 					}
 					return null;
 				}
-        		
+
         	});
-            
+
             return artifactsByFile;
-    	
+
     }
-    
+
     @SuppressWarnings("unchecked")
 	private void checkCompileClasspath() throws MojoExecutionException
     {
-        try {	
+        try {
 	        LOG.info("Checking compile classpath");
-	        checkClasspath( project.getCompileArtifacts(), project.getCompileClasspathElements());  
+	        checkClasspath( project.getCompileArtifacts(), project.getCompileClasspathElements());
         }
         catch (DependencyResolutionRequiredException ex) {
             throw new MojoExecutionException("Could not resolve dependencies", ex);
         }
 
     }
-    
+
     @SuppressWarnings("unchecked")
 	private void checkRuntimeClasspath() throws MojoExecutionException
     {
         try {
             LOG.info("Checking runtime classpath");
-	        checkClasspath( project.getRuntimeArtifacts(), project.getRuntimeClasspathElements());  
+	        checkClasspath( project.getRuntimeArtifacts(), project.getRuntimeClasspathElements());
         }
         catch (DependencyResolutionRequiredException ex) {
             throw new MojoExecutionException("Could not resolve dependencies", ex);
@@ -236,7 +236,7 @@ public class ClassFinderMojo extends AbstractMojo
             throw new MojoExecutionException("Could not resolve dependencies", ex);
         }
     }
-    
+
     private ClasspathDescriptor createClasspathDescriptor(List<String> classpathElements) throws MojoExecutionException
     {
         ClasspathDescriptor classpathDesc = new ClasspathDescriptor();
@@ -246,7 +246,7 @@ public class ClassFinderMojo extends AbstractMojo
 
         if( classpathElements != null ) {
 	        for (String element : classpathElements ) {
-	
+
 	            try {
 	                classpathDesc.add(new File(element));
 	            }
@@ -266,7 +266,7 @@ public class ClassFinderMojo extends AbstractMojo
         final Map<File,Artifact> artifactsByFile = new HashMap<File,Artifact>(artifacts.size());
 
         for (Artifact artifact : artifacts ) {
-            
+
             final File     localPath = getLocalProjectPath(artifact);
             final File     repoPath  = artifact.getFile();
 
@@ -280,7 +280,7 @@ public class ClassFinderMojo extends AbstractMojo
                 artifactsByFile.put(repoPath, artifact);
             }
         }
-        
+
         return artifactsByFile;
     }
 
@@ -316,5 +316,5 @@ public class ClassFinderMojo extends AbstractMojo
             artifactsByFile.put(outputDir, null);
         }
     }
-    
+
 }
