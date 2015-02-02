@@ -13,7 +13,6 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-
 package com.ning.maven.plugins.duplicatefinder;
 
 import java.io.File;
@@ -37,63 +36,70 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.pyx4j.log4j.MavenLogAppender;
-
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
 /**
  * Finds duplicate classes/resources.
  *
- * @goal find
- * @requiresDependencyResolution test
- * @see <a href="http://docs.codehaus.org/display/MAVENUSER/Mojo+Developer+Cookbook">Mojo Developer Cookbook</a>
+ * @see
+ * <a href="http://docs.codehaus.org/display/MAVENUSER/Mojo+Developer+Cookbook">Mojo
+ * Developer Cookbook</a>
  * @author bsorrentino
  */
-public class ClassFinderMojo extends AbstractMojo
-{
+@Mojo(name = "find",
+        requiresProject = true,
+        threadSafe = true,
+        requiresDependencyResolution = ResolutionScope.TEST)
+public class ClassFinderMojo extends AbstractMojo {
+
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     /**
      * The maven project (effective pom).
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
-    */
+     */
+    @Component
     private MavenProject project;
 
     /**
      * Whether the mojo should use the default resource ignore list.
+     *
      * @parameter default-value="true"
      */
-    private boolean useDefaultResourceIgnoreList = true;
+    @Parameter(defaultValue = "true")
+    boolean useDefaultResourceIgnoreList = true;
 
     /**
      * Additional resources that should be ignored.
-     * @parameter alias="ignoredResources"
      */
-    private String [] ignoredResources;
+    @Parameter(alias = "ignoredResources")
+    private String[] ignoredResources;
 
     /**
      * A set of dependecies that should be completely ignored in the check.
-     * @parameter property="ignoredDependencies"
      */
-    private DependencyWrapper[] ignoredDependencies;
+    @Parameter(property = "ignoredDependencies")
+    DependencyWrapper[] ignoredDependencies;
 
     /**
      * Check the compile classpath. On by default.
-     * @parameter default-value="true"
      */
-    private boolean checkCompileClasspath = true;
+    @Parameter(defaultValue = "true")
+    boolean checkCompileClasspath = true;
 
     /**
      * Check the runtime classpath. On by default.
-     * @parameter default-value="true"
      */
-    private boolean checkRuntimeClasspath = true;
+    @Parameter(defaultValue = "true")
+    boolean checkRuntimeClasspath = true;
 
     /**
      * Check the test classpath. On by default.
-     * @parameter default-value="true"
      */
-    private boolean checkTestClasspath = true;
+    @Parameter(defaultValue = "true")
+    boolean checkTestClasspath = true;
 
     /**
      * Skip the plugin execution.
@@ -104,16 +110,15 @@ public class ClassFinderMojo extends AbstractMojo
      *   </configuration>
      * </pre>
      *
-     * @parameter default-value="false"
      */
+    @Parameter(defaultValue = "false")
     protected boolean skip = false;
 
     /**
      * Simple class name
      *
-     * @parameter alias="className"
-     * 			  expression="${className}"
      */
+    @Parameter(alias = "className", property = "className")
     private String className;
 
     /**
@@ -121,23 +126,21 @@ public class ClassFinderMojo extends AbstractMojo
      * @param ignoredDependencies
      * @throws InvalidVersionSpecificationException
      */
-    public void setIgnoredDependencies(Dependency[] ignoredDependencies) throws InvalidVersionSpecificationException
-    {
+    public void setIgnoredDependencies(Dependency[] ignoredDependencies) throws InvalidVersionSpecificationException {
         this.ignoredDependencies = new DependencyWrapper[ignoredDependencies.length];
         for (int idx = 0; idx < ignoredDependencies.length; idx++) {
             this.ignoredDependencies[idx] = new DependencyWrapper(ignoredDependencies[idx]);
         }
     }
 
-    public void execute() throws MojoExecutionException
-    {
+    @Override
+    public void execute() throws MojoExecutionException {
         MavenLogAppender.startPluginLog(this);
 
         try {
             if (skip) {
                 LOG.debug("Skipping execution!");
-            }
-            else {
+            } else {
                 if (checkCompileClasspath) {
                     checkCompileClasspath();
                 }
@@ -148,127 +151,115 @@ public class ClassFinderMojo extends AbstractMojo
                     checkTestClasspath();
                 }
             }
-        }
-        finally {
+        } finally {
             MavenLogAppender.endPluginLog(this);
         }
     }
 
-    private <T> void forEach( Collection<T> list, F<Void,T> functor ) {
+    private <T> void forEach(Collection<T> list, F<Void, T> functor) {
 
-    	for( T e : list ) {
+        for (T e : list) {
 
-    		functor.f( e );
-    	}
+            functor.f(e);
+        }
     }
 
-    private Map<File,Artifact> checkClasspath(List<Artifact> artifactList,
-    							List<String> classpathElementList ) throws MojoExecutionException, DependencyResolutionRequiredException
-    {
+    private Map<File, Artifact> checkClasspath(List<Artifact> artifactList,
+            List<String> classpathElementList) throws MojoExecutionException, DependencyResolutionRequiredException {
 
-            final Map<File,Artifact> artifactsByFile = createArtifactsByFileMap(artifactList);
+        final Map<File, Artifact> artifactsByFile = createArtifactsByFileMap(artifactList);
 
-            addOutputDirectory(artifactsByFile);
+        addOutputDirectory(artifactsByFile);
 
-        	final ClasspathDescriptor classpathDesc = createClasspathDescriptor(classpathElementList);
+        final ClasspathDescriptor classpathDesc = createClasspathDescriptor(classpathElementList);
 
-        	final Set<String> classNameList = classpathDesc.getClasss();
-        	forEach(classNameList, new F<Void,String>() {
+        final Set<String> classNameList = classpathDesc.getClasss();
+        forEach(classNameList, new F<Void, String>() {
 
-				@Override
-				public Void f(String p) {
-					getLog().debug( String.format("evaluate class[%s]", p));
-					if( className!=null && p.endsWith(className) ) {
+            @Override
+            public Void f(String p) {
+                getLog().debug(String.format("evaluate class[%s]", p));
+                if (className != null && p.endsWith(className)) {
 
-						getLog().info( String.format("FOUND: %s", p));
+                    getLog().info(String.format("FOUND: %s", p));
 
-						final Set<File> sourceSet = classpathDesc.getElementsHavingClass(p);
+                    final Set<File> sourceSet = classpathDesc.getElementsHavingClass(p);
 
-						for( File f : sourceSet ) {
-							getLog().info( String.format("\tsource: %s", f.getPath()));
-						}
+                    for (File f : sourceSet) {
+                        getLog().info(String.format("\tsource: %s", f.getPath()));
+                    }
 
-					}
-					return null;
-				}
+                }
+                return null;
+            }
 
-        	});
+        });
 
-            return artifactsByFile;
+        return artifactsByFile;
 
     }
 
     @SuppressWarnings("unchecked")
-	private void checkCompileClasspath() throws MojoExecutionException
-    {
+    private void checkCompileClasspath() throws MojoExecutionException {
         try {
-	        LOG.info("Checking compile classpath");
-	        checkClasspath( project.getCompileArtifacts(), project.getCompileClasspathElements());
-        }
-        catch (DependencyResolutionRequiredException ex) {
+            LOG.info("Checking compile classpath");
+            checkClasspath(project.getCompileArtifacts(), project.getCompileClasspathElements());
+        } catch (DependencyResolutionRequiredException ex) {
             throw new MojoExecutionException("Could not resolve dependencies", ex);
         }
 
     }
 
     @SuppressWarnings("unchecked")
-	private void checkRuntimeClasspath() throws MojoExecutionException
-    {
+    private void checkRuntimeClasspath() throws MojoExecutionException {
         try {
             LOG.info("Checking runtime classpath");
-	        checkClasspath( project.getRuntimeArtifacts(), project.getRuntimeClasspathElements());
-        }
-        catch (DependencyResolutionRequiredException ex) {
+            checkClasspath(project.getRuntimeArtifacts(), project.getRuntimeClasspathElements());
+        } catch (DependencyResolutionRequiredException ex) {
             throw new MojoExecutionException("Could not resolve dependencies", ex);
         }
     }
 
     @SuppressWarnings("unchecked")
-	private void checkTestClasspath() throws MojoExecutionException
-    {
+    private void checkTestClasspath() throws MojoExecutionException {
         try {
             LOG.info("Checking test classpath");
 
-            Map<File,Artifact> artifactsByFile = checkClasspath(project.getTestArtifacts(),project.getTestClasspathElements());
+            Map<File, Artifact> artifactsByFile = checkClasspath(project.getTestArtifacts(), project.getTestClasspathElements());
             addOutputDirectory(artifactsByFile);
-        }
-        catch (DependencyResolutionRequiredException ex) {
+        } catch (DependencyResolutionRequiredException ex) {
             throw new MojoExecutionException("Could not resolve dependencies", ex);
         }
     }
 
-    private ClasspathDescriptor createClasspathDescriptor(List<String> classpathElements) throws MojoExecutionException
-    {
+    private ClasspathDescriptor createClasspathDescriptor(List<String> classpathElements) throws MojoExecutionException {
         ClasspathDescriptor classpathDesc = new ClasspathDescriptor();
 
         classpathDesc.setUseDefaultResourceIgnoreList(useDefaultResourceIgnoreList);
         classpathDesc.setIgnoredResources(ignoredResources);
 
-        if( classpathElements != null ) {
-	        for (String element : classpathElements ) {
+        if (classpathElements != null) {
+            for (String element : classpathElements) {
 
-	            try {
-	                classpathDesc.add(new File(element));
-	            }
-	            catch (FileNotFoundException ex) {
-	                LOG.debug("Could not access classpath element " + element);
-	            }
-	            catch (IOException ex) {
-	                throw new MojoExecutionException("Error trying to access element " + element, ex);
-	            }
-	        }
+                try {
+                    classpathDesc.add(new File(element));
+                } catch (FileNotFoundException ex) {
+                    LOG.debug("Could not access classpath element " + element);
+                } catch (IOException ex) {
+                    throw new MojoExecutionException("Error trying to access element " + element, ex);
+                }
+            }
         }
         return classpathDesc;
     }
 
-    private Map<File,Artifact> createArtifactsByFileMap(List<Artifact> artifacts) throws DependencyResolutionRequiredException
-    {
-        final Map<File,Artifact> artifactsByFile = new HashMap<File,Artifact>(artifacts.size());
+    private Map<File, Artifact> createArtifactsByFileMap(List<Artifact> artifacts) throws DependencyResolutionRequiredException {
+        final Map<File, Artifact> artifactsByFile = new HashMap<File, Artifact>(artifacts.size());
 
-        for (Artifact artifact : artifacts ) {
+        for (Artifact artifact : artifacts) {
 
-            final File     localPath = getLocalProjectPath(artifact);
-            final File     repoPath  = artifact.getFile();
+            final File localPath = getLocalProjectPath(artifact);
+            final File repoPath = artifact.getFile();
 
             if ((localPath == null) && (repoPath == null)) {
                 throw new DependencyResolutionRequiredException(artifact);
@@ -284,32 +275,25 @@ public class ClassFinderMojo extends AbstractMojo
         return artifactsByFile;
     }
 
-    private File getLocalProjectPath(Artifact artifact) throws DependencyResolutionRequiredException
-    {
-        String       refId         = artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
-        MavenProject owningProject = (MavenProject)project.getProjectReferences().get(refId);
+    private File getLocalProjectPath(Artifact artifact) throws DependencyResolutionRequiredException {
+        String refId = artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
+        MavenProject owningProject = (MavenProject) project.getProjectReferences().get(refId);
 
-        if (owningProject != null)
-        {
-            if (artifact.getType().equals("test-jar"))
-            {
+        if (owningProject != null) {
+            if (artifact.getType().equals("test-jar")) {
                 File testOutputDir = new File(owningProject.getBuild().getTestOutputDirectory());
 
-                if (testOutputDir.exists())
-                {
+                if (testOutputDir.exists()) {
                     return testOutputDir;
                 }
-            }
-            else
-            {
+            } else {
                 return new File(project.getBuild().getOutputDirectory());
             }
         }
         return null;
     }
 
-    private void addOutputDirectory(Map<File,Artifact> artifactsByFile)
-    {
+    private void addOutputDirectory(Map<File, Artifact> artifactsByFile) {
         File outputDir = new File(project.getBuild().getOutputDirectory());
 
         if (outputDir.exists()) {
