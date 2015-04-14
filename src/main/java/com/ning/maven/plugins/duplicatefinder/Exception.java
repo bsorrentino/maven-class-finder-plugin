@@ -33,9 +33,7 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-@SuppressFBWarnings("BAD_PRACTICE")
 public class Exception
 {
     public static final String CURRENT_PROJECT_IDENTIFIER = "<current project>";
