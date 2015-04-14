@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package com.ning.maven.plugins.duplicatefinder;
+package org.bsc.maven.plugin.findclass;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
