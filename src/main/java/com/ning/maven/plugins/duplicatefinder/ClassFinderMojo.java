@@ -254,7 +254,7 @@ public class ClassFinderMojo extends AbstractMojo {
     }
 
     private Map<File, Artifact> createArtifactsByFileMap(List<Artifact> artifacts) throws DependencyResolutionRequiredException {
-        final Map<File, Artifact> artifactsByFile = new HashMap<File, Artifact>(artifacts.size());
+        final Map<File, Artifact> artifactsByFile = new HashMap<>(artifacts.size());
 
         for (Artifact artifact : artifacts) {
 

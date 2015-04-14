@@ -57,9 +57,9 @@ public class ClasspathDescriptor
                     Pattern.compile("META-INF/SPRING\\.SCHEMAS"),
                     Pattern.compile("META-INF/SPRING\\.TOOLING") };
 
-    private static final Set<String> IGNORED_LOCAL_DIRECTORIES = new HashSet<String>();
+    private static final Set<String> IGNORED_LOCAL_DIRECTORIES = new HashSet<>();
 
-    private static final Map<File, Cached> CACHED_BY_ELEMENT = new HashMap<File, Cached>();
+    private static final Map<File, Cached> CACHED_BY_ELEMENT = new HashMap<>();
 
     static {
         IGNORED_LOCAL_DIRECTORIES.add(".GIT");
@@ -68,9 +68,9 @@ public class ClasspathDescriptor
         IGNORED_LOCAL_DIRECTORIES.add(".BZR");
     }
 
-    private final Map<String, Set<File>> classesWithElements = new TreeMap<String, Set<File>>();
+    private final Map<String, Set<File>> classesWithElements = new TreeMap<>();
 
-    private final Map<String, Set<File>> resourcesWithElements = new TreeMap<String, Set<File>>();
+    private final Map<String, Set<File>> resourcesWithElements = new TreeMap<>();
 
     private boolean useDefaultResourceIgnoreList = true;
 
@@ -150,26 +150,22 @@ public class ClasspathDescriptor
             return;
         }
 
-        final List<String> classes = new ArrayList<String>();
-        final List<String> resources = new ArrayList<String>();
+        final List<String> classes = new ArrayList<>();
+        final List<String> resources = new ArrayList<>();
         final File[] files = directory.listFiles();
         final String pckgName = element.equals(directory) ? null : (parentPackageName == null ? "" : parentPackageName + ".") + directory.getName();
 
         if (files != null && files.length > 0) {
-            for (int idx = 0; idx < files.length; idx++) {
-                if (files[idx].isDirectory() && !IGNORED_LOCAL_DIRECTORIES.contains(files[idx].getName().toUpperCase())) {
-                    addDirectory(element, pckgName, files[idx]);
-                }
-                else if (files[idx].isFile()) {
-                    if ("class".equals(FilenameUtils.getExtension(files[idx].getName()))) {
-                        final String className = (pckgName == null ? "" : pckgName + ".") + FilenameUtils.getBaseName(files[idx].getName());
-
+            for (File file : files) {
+                if (file.isDirectory() && !IGNORED_LOCAL_DIRECTORIES.contains(file.getName().toUpperCase())) {
+                    addDirectory(element, pckgName, file);
+                } else if (file.isFile()) {
+                    if ("class".equals(FilenameUtils.getExtension(file.getName()))) {
+                        final String className = (pckgName == null ? "" : pckgName + ".") + FilenameUtils.getBaseName(file.getName());
                         classes.add(className);
                         addClass(className, element);
-                    }
-                    else {
-                        final String resourcePath = (pckgName == null ? "" : pckgName.replace('.', '/') + "/") + files[idx].getName();
-
+                    } else {
+                        final String resourcePath = (pckgName == null ? "" : pckgName.replace('.', '/') + "/") + file.getName();
                         resources.add(resourcePath);
                         addResource(resourcePath, element);
                     }
@@ -186,8 +182,8 @@ public class ClasspathDescriptor
             return;
         }
 
-        final List<String> classes = new ArrayList<String>();
-        final List<String> resources = new ArrayList<String>();
+        final List<String> classes = new ArrayList<>();
+        final List<String> resources = new ArrayList<>();
         InputStream input = null;
         ZipInputStream zipInput = null;
 
@@ -235,7 +231,7 @@ public class ClasspathDescriptor
             Set<File> elements = classesWithElements.get(className);
 
             if (elements == null) {
-                elements = new HashSet<File>();
+                elements = new HashSet<>();
                 classesWithElements.put(className, elements);
             }
             elements.add(element);
@@ -248,7 +244,7 @@ public class ClasspathDescriptor
             Set<File> elements = resourcesWithElements.get(path);
 
             if (elements == null) {
-                elements = new HashSet<File>();
+                elements = new HashSet<>();
                 resourcesWithElements.put(path, elements);
             }
             elements.add(element);
@@ -262,8 +258,8 @@ public class ClasspathDescriptor
         // Unless it has been turned off...
         if (useDefaultResourceIgnoreList) {
             //  check whether the path is in the list of default ignores
-            for (int idx = 0; idx < DEFAULT_IGNORED_RESOURCES.length; idx++) {
-                if (DEFAULT_IGNORED_RESOURCES[idx].matcher(uppercasedPath).matches()) {
+            for (Pattern ignored_resource : DEFAULT_IGNORED_RESOURCES) {
+                if (ignored_resource.matcher(uppercasedPath).matches()) {
                     return true;
                 }
             }
@@ -271,8 +267,8 @@ public class ClasspathDescriptor
 
         // check whether there is an user supplied ignore pattern.
         if (ignoredResourcesPatterns != null) {
-            for (int idx = 0; idx < ignoredResourcesPatterns.length; idx++) {
-                if (ignoredResourcesPatterns[idx].matcher(uppercasedPath).matches()) {
+            for (Pattern ignoredResourcesPattern : ignoredResourcesPatterns) {
+                if (ignoredResourcesPattern.matcher(uppercasedPath).matches()) {
                     return true;
                 }
             }
