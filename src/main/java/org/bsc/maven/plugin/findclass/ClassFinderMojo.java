@@ -156,7 +156,7 @@ public class ClassFinderMojo extends AbstractMojo {
         }
     }
 
-    private <T> void forEach(Collection<T> list, F<Void, T> functor) {
+    private <T> void forEach(Collection<T> list, F<T> functor) {
 
         for (T e : list) {
 
@@ -174,10 +174,10 @@ public class ClassFinderMojo extends AbstractMojo {
         final ClasspathDescriptor classpathDesc = createClasspathDescriptor(classpathElementList);
 
         final Set<String> classNameList = classpathDesc.getClasss();
-        forEach(classNameList, new F<Void, String>() {
+        forEach(classNameList, new F<String>() {
 
             @Override
-            public Void f(String p) {
+            public void f(String p) {
                 getLog().debug(String.format("evaluate class[%s]", p));
                 if (className != null && p.endsWith(className)) {
 
@@ -190,7 +190,6 @@ public class ClassFinderMojo extends AbstractMojo {
                     }
 
                 }
-                return null;
             }
 
         });

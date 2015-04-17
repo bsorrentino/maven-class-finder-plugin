@@ -17,10 +17,9 @@ package org.bsc.functional;
 
 /**
  *
- * @param <R>
  * @param <P>
  */
-public interface F<R, P> {
+public interface F<P> {
 
-    R f(P p);
+    void f(P p);
 }

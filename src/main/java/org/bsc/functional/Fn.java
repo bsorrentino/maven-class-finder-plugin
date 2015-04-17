@@ -17,9 +17,10 @@ package org.bsc.functional;
 
 /**
  *
- * @author softphone
+ * @param <R>
  * @param <P>
  */
-public interface Filter<P> extends Fn<Boolean,P> {
+public interface Fn<R, P> {
 
+    R f(P p);
 }
